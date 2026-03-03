@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Simple NPC dialog editor with JSON project persistence and .uc export."""
+"""NPC dialog editor with JSON project persistence and separate .uc export."""
 
 from __future__ import annotations
 
@@ -24,13 +24,12 @@ UC_FILE_TYPES = [
 
 @dataclass
 class DialogNode:
-    """A single dialog node represented as text + links to child nodes."""
+    """A single dialog node in the editor."""
 
     text: str = ""
     responses: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
-        """Serialize node into a JSON-serializable dictionary."""
         return {
             "text": self.text,
             "responses": list(self.responses),
@@ -38,17 +37,19 @@ class DialogNode:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "DialogNode":
-        """Create a node from a dictionary, tolerating missing fields."""
+        responses = data.get("responses", [])
+        if not isinstance(responses, list):
+            responses = []
+
         return cls(
             text=str(data.get("text", "")),
-            responses=[str(item) for item in data.get("responses", [])],
+            responses=[str(item) for item in responses],
         )
 
 
 class NpcDialogTool(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
-        self.title("NPC Dialog Tool")
         self.geometry("900x600")
 
         self.name_var = tk.StringVar()
@@ -58,17 +59,16 @@ class NpcDialogTool(tk.Tk):
         self.nodes: list[DialogNode] = []
         self.project_path: Path | None = None
         self._dirty = False
-
         self._updating_ui = False
 
         self._build_ui()
         self._bind_events()
         self.protocol("WM_DELETE_WINDOW", self.on_close)
+
         self.new_project(prompt=False)
 
     def _build_ui(self) -> None:
         menubar = tk.Menu(self)
-
         file_menu = tk.Menu(menubar, tearoff=False)
         file_menu.add_command(label="New Project", command=self.new_project)
         file_menu.add_command(label="Open Project...", command=self.open_project)
@@ -79,23 +79,34 @@ class NpcDialogTool(tk.Tk):
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.on_close)
         menubar.add_cascade(label="File", menu=file_menu)
-
         self.config(menu=menubar)
 
         top = tk.Frame(self)
         top.pack(fill=tk.X, padx=8, pady=8)
 
-        tk.Label(top, text="Name").grid(row=0, column=0, sticky="w")
-        tk.Entry(top, textvariable=self.name_var).grid(
-            row=0, column=1, sticky="ew", padx=(6, 10)
+        project_buttons = tk.Frame(top)
+        project_buttons.grid(row=0, column=0, columnspan=6, sticky="w", pady=(0, 8))
+        tk.Button(project_buttons, text="New Project", command=self.new_project).pack(side=tk.LEFT)
+        tk.Button(project_buttons, text="Open Project...", command=self.open_project).pack(
+            side=tk.LEFT, padx=(6, 0)
         )
-        tk.Label(top, text="Object").grid(row=0, column=2, sticky="w")
-        tk.Entry(top, textvariable=self.object_var).grid(
-            row=0, column=3, sticky="ew", padx=(6, 10)
+        tk.Button(project_buttons, text="Save Project", command=self.save_project).pack(
+            side=tk.LEFT, padx=(6, 0)
         )
-        tk.Label(top, text="First line").grid(row=0, column=4, sticky="w")
+        tk.Button(project_buttons, text="Save Project As...", command=self.save_project_as).pack(
+            side=tk.LEFT, padx=(6, 0)
+        )
+        tk.Button(project_buttons, text="Export .uc...", command=self.export_uc).pack(
+            side=tk.LEFT, padx=(16, 0)
+        )
+
+        tk.Label(top, text="Name").grid(row=1, column=0, sticky="w")
+        tk.Entry(top, textvariable=self.name_var).grid(row=1, column=1, sticky="ew", padx=(6, 10))
+        tk.Label(top, text="Object").grid(row=1, column=2, sticky="w")
+        tk.Entry(top, textvariable=self.object_var).grid(row=1, column=3, sticky="ew", padx=(6, 10))
+        tk.Label(top, text="First line").grid(row=1, column=4, sticky="w")
         tk.Entry(top, textvariable=self.first_line_var).grid(
-            row=0, column=5, sticky="ew", padx=(6, 0)
+            row=1, column=5, sticky="ew", padx=(6, 0)
         )
 
         top.grid_columnconfigure(1, weight=1)
@@ -142,10 +153,9 @@ class NpcDialogTool(tk.Tk):
         self._set_dirty(True)
 
     def _update_title(self) -> None:
-        base = "NPC Dialog Tool"
         suffix = self.project_path.name if self.project_path else "Untitled"
         dirty = " *" if self._dirty else ""
-        self.title(f"{base} - {suffix}{dirty}")
+        self.title(f"NPC Dialog Tool - {suffix}{dirty}")
 
     def _current_selection(self) -> int | None:
         selected = self.node_list.curselection()
@@ -167,6 +177,7 @@ class NpcDialogTool(tk.Tk):
             self.responses_text.delete("1.0", tk.END)
             if index is None:
                 return
+
             node = self.nodes[index]
             self.node_text.insert("1.0", node.text)
             self.responses_text.insert("1.0", "\n".join(node.responses))
@@ -176,9 +187,11 @@ class NpcDialogTool(tk.Tk):
     def _on_node_editor_changed(self) -> None:
         if self._updating_ui:
             return
+
         index = self._current_selection()
         if index is None:
             return
+
         node = self.nodes[index]
         node.text = self.node_text.get("1.0", tk.END).rstrip("\n")
         node.responses = [
@@ -204,31 +217,39 @@ class NpcDialogTool(tk.Tk):
         index = self._current_selection()
         if index is None:
             return
+
         del self.nodes[index]
         self._refresh_node_list()
         if self.nodes:
             next_index = min(index, len(self.nodes) - 1)
             self.node_list.selection_set(next_index)
-            self._on_select_node()
-        else:
-            self._on_select_node()
+        self._on_select_node()
         self._mark_dirty()
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "name": self.name_var.get(),
-            "object": self.object_var.get(),
-            "first_line": self.first_line_var.get(),
+            "name_var": self.name_var.get(),
+            "object_var": self.object_var.get(),
+            "first_line_var": self.first_line_var.get(),
             "nodes": [node.to_dict() for node in self.nodes],
         }
 
     def load_dict(self, data: dict[str, Any]) -> None:
+        nodes = data.get("nodes", [])
+        if not isinstance(nodes, list):
+            nodes = []
+
+        # keep backwards compatibility with earlier key names
+        name = data.get("name_var", data.get("name", ""))
+        obj = data.get("object_var", data.get("object", ""))
+        first = data.get("first_line_var", data.get("first_line", ""))
+
         self._updating_ui = True
         try:
-            self.name_var.set(str(data.get("name", "")))
-            self.object_var.set(str(data.get("object", "")))
-            self.first_line_var.set(str(data.get("first_line", "")))
-            self.nodes = [DialogNode.from_dict(item) for item in data.get("nodes", [])]
+            self.name_var.set(str(name))
+            self.object_var.set(str(obj))
+            self.first_line_var.set(str(first))
+            self.nodes = [DialogNode.from_dict(item) for item in nodes if isinstance(item, dict)]
             self._refresh_node_list()
             self.node_list.selection_clear(0, tk.END)
             if self.nodes:
@@ -240,6 +261,7 @@ class NpcDialogTool(tk.Tk):
     def _confirm_discard_changes(self) -> bool:
         if not self._dirty:
             return True
+
         result = messagebox.askyesnocancel(
             "Unsaved Changes",
             "You have unsaved changes. Save before continuing?",
@@ -254,13 +276,15 @@ class NpcDialogTool(tk.Tk):
     def new_project(self, prompt: bool = True) -> None:
         if prompt and not self._confirm_discard_changes():
             return
+
         self.project_path = None
-        self.load_dict({"name": "", "object": "", "first_line": "", "nodes": []})
+        self.load_dict({"name_var": "", "object_var": "", "first_line_var": "", "nodes": []})
         self._set_dirty(False)
 
     def open_project(self) -> None:
         if not self._confirm_discard_changes():
             return
+
         path = filedialog.askopenfilename(
             title="Open Project",
             filetypes=PROJECT_FILE_TYPES,
@@ -268,10 +292,13 @@ class NpcDialogTool(tk.Tk):
         )
         if not path:
             return
+
         try:
             with open(path, "r", encoding="utf-8") as handle:
                 data = json.load(handle)
-        except (OSError, json.JSONDecodeError) as exc:
+            if not isinstance(data, dict):
+                raise ValueError("Project file root must be a JSON object.")
+        except (OSError, json.JSONDecodeError, ValueError) as exc:
             messagebox.showerror("Open Failed", f"Could not open project:\n{exc}")
             return
 
@@ -282,6 +309,7 @@ class NpcDialogTool(tk.Tk):
     def save_project(self) -> bool:
         if self.project_path is None:
             return self.save_project_as()
+
         try:
             with open(self.project_path, "w", encoding="utf-8") as handle:
                 json.dump(self.to_dict(), handle, indent=2)
@@ -338,9 +366,9 @@ class NpcDialogTool(tk.Tk):
 
         for i, node in enumerate(self.nodes):
             lines.append(f"// Node {i + 1}")
-            lines.append(f"say(\"{node.text.replace('\\"', '\\\\"')}\");")
+            lines.append(f"say(\"{node.text.replace('\"', '\\\"')}\");")
             for response in node.responses:
-                lines.append(f"answer(\"{response.replace('\\"', '\\\\"')}\");")
+                lines.append(f"answer(\"{response.replace('\"', '\\\"')}\");")
             lines.append("")
 
         try:
