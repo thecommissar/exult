@@ -18,101 +18,59 @@ var isPositionBlocked(var start_position, var destination, var direction)
 	
 	var start_x = start_position[X];
 	var start_y = start_position[Y];
+	var dx = 0;
+	var dy = 0;
+	var range = 0;
+	var i = 1;
 	const int SHAPE = 439; //CHIMNEY = z axis 2
 	const int MAX_JUMP_HEIGHT = 0; //z level jump height, change as needed
 
+	if (direction == EAST)
+	{
+		dx = 1;
+		dy = 0;
+		range = destination[X] - start_x;
+	}
+	else if (direction == WEST)
+	{
+		dx = -1;
+		dy = 0;
+		range = start_x - destination[X];
+	}
+	else if (direction == NORTH)
+	{
+		dx = 0;
+		dy = 1;
+		range = destination[Y] - start_y;
+	}
+	else if (direction == SOUTH)
+	{
+		dx = 0;
+		dy = -1;
+		range = start_y - destination[Y];
+	}
+	else
+	{
+		UI_error_message("Invalid jump direction");
+		return true;
+	}
 
-	
-	if (start_x < destination[X])
-		start_x = start_x + 1;
-	else if (start_y < destination[Y])	
-		start_y = start_y - 1;
-	else if (start_x > destination[X])
-		start_x = start_x - 1;
-	else // if (start_y > destination[Y])	
-		start_y = start_y + 1;
-	
-	
-	if (start_x < destination[X])
+	while (i <= range)
 	{
-		while (start_x < destination[X])
+		var probe_x = start_x + (i * dx);
+		var probe_y = start_y + (i * dy);
+
+		if (UI_is_not_blocked([probe_x, probe_y, MAX_JUMP_HEIGHT], SHAPE, FRAME_ANY))
 		{
-			if (UI_is_not_blocked([start_x, start_y, MAX_JUMP_HEIGHT], SHAPE, FRAME_ANY))
-			{
-				UI_error_message("No impassible object located at " + start_x + ", " + start_y);
-				
-				
-			}	
-			else //something is blocking the jump, no need to check the rest
-			{
-				UI_error_message("An impassible object located at " + start_x + ", " + start_y);	
-				return true;
-			}	
-			start_x += 1;
+			UI_error_message("No impassible object located at " + probe_x + ", " + probe_y);
 		}
-	
-	
+		else //something is blocking the jump, no need to check the rest
+		{
+			UI_error_message("An impassible object located at " + probe_x + ", " + probe_y);
+			return true;
+		}
+		i += 1;
 	}
-	else if (start_x > destination[X])
-	{
-		while (start_x > destination[X])
-		{
-			if (UI_is_not_blocked([start_x, start_y, MAX_JUMP_HEIGHT], SHAPE, FRAME_ANY))
-			{
-				UI_error_message("No impassible object located at " + start_x + ", " + start_y);
-				
-				
-			}	
-			else //something is blocking the jump, no need to check the rest
-			{
-				UI_error_message("An impassible object located at " + start_x + ", " + start_y);	
-				return true;
-			}	
-			start_x -= 1;
-		}
-	
-	
-	}
-	else if (start_y < destination[Y])
-	{
-		while (start_y < destination[Y])
-		{
-			if (UI_is_not_blocked([start_x, start_y, MAX_JUMP_HEIGHT], SHAPE, FRAME_ANY))
-			{
-				UI_error_message("No impassible object located at " + start_x + ", " + start_y);
-				
-				
-			}	
-			else //something is blocking the jump, no need to check the rest
-			{
-				UI_error_message("An impassible object located at " + start_x + ", " + start_y);	
-				return true;
-			}	
-			start_y += 1;
-		}
-	
-	
-	}	
-	else if (start_y > destination[Y])
-	{
-		while (start_y > destination[Y])
-		{
-			if (UI_is_not_blocked([start_x, start_y, MAX_JUMP_HEIGHT], SHAPE, FRAME_ANY))
-			{
-				UI_error_message("No impassible object located at " + start_x + ", " + start_y);
-				
-				
-			}	
-			else //something is blocking the jump, no need to check the rest
-			{
-				UI_error_message("An impassible object located at " + start_x + ", " + start_y);	
-				return true;
-			}	
-			start_y -= 1;
-		}
-	
-	
-	}		
 	return false;
 }
 
@@ -132,7 +90,7 @@ void wand shape#(476) ()
 	else if (direction == NORTH)
 		desY = position[Y] + 5;
 	else if (direction == SOUTH)
-		desY = position[Y];
+		desY = position[Y] - 5;
 	else
 		UI_error_message("Something went wrong - direction not found.");
 	destination = [desX, desY, desZ];
