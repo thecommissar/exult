@@ -1,4 +1,61 @@
 
+var canLandAt(var destination, var avatar_z)
+{
+	var avatar_shape = UI_get_item_shape(AVATAR);
+	var start_position = UI_get_object_position(AVATAR);
+	var start_z = UI_get_lift(AVATAR);
+	var dest_x = destination[X];
+	var dest_y = destination[Y];
+
+	const int LANDING_Z_TOLERANCE = 2;
+	const int LANDING_SCAN_MIN = 0;
+	const int LANDING_SCAN_MAX = 7;
+
+	var candidate_z = avatar_z + LANDING_Z_TOLERANCE;
+	var best_z = -1;
+
+	while (candidate_z >= avatar_z - LANDING_Z_TOLERANCE)
+	{
+		if (candidate_z >= LANDING_SCAN_MIN && candidate_z <= LANDING_SCAN_MAX)
+		{
+			UI_move_object(AVATAR, [dest_x, dest_y, candidate_z], 0);
+			var new_position = UI_get_object_position(AVATAR);
+			var new_z = UI_get_lift(AVATAR);
+
+			if (new_position[X] == dest_x && new_position[Y] == dest_y && new_z == candidate_z)
+			{
+				best_z = candidate_z;
+				candidate_z = avatar_z - LANDING_Z_TOLERANCE - 1; //break
+			}
+		}
+		candidate_z -= 1;
+	}
+
+	UI_move_object(AVATAR, [start_position[X], start_position[Y], start_z], 0);
+
+	if (best_z == -1)
+	{
+		if (UI_is_water([destination]))
+		{
+			UI_error_message("No standable landing surface (water/liquid only)");
+		}
+		return false;
+	}
+
+	var z_delta = best_z - avatar_z;
+	if (z_delta < 0)
+		z_delta = 0 - z_delta;
+
+	if (z_delta > LANDING_Z_TOLERANCE)
+	{
+		UI_error_message("Landing z delta too high: " + z_delta);
+		return false;
+	}
+
+	destination[Z] = best_z;
+	return true;
+}
+
 //take Avatar's current location and destination to see if he can jump to it
 var isPositionBlocked(var start_position, var destination, var direction)
 {
@@ -7,12 +64,6 @@ var isPositionBlocked(var start_position, var destination, var direction)
 	if (UI_is_pc_inside())
 	{
 		UI_error_message("Avatar is inside, abort jumping");
-		return true;
-	}	
-	//if destination tile is water, automatically deny jumping:
-	if (UI_is_water([destination]))
-	{
-		UI_error_message("Destination tile is water, abort jumping");	
 		return true;
 	}	
 	
@@ -71,6 +122,13 @@ var isPositionBlocked(var start_position, var destination, var direction)
 		}
 		i += 1;
 	}
+
+	if (!canLandAt(destination, start_position[Z]))
+	{
+		UI_error_message("Landing validation failed at " + destination[X] + ", " + destination[Y]);
+		return true;
+	}
+
 	return false;
 }
 
