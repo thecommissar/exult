@@ -56,76 +56,77 @@ var canLandAt(var destination, var avatar_z)
 	return true;
 }
 
-//take Avatar's current location and destination to see if he can jump to it
+// Validate each forward jump step against the scripted jump arc profile.
 var isPositionBlocked(var start_position, var destination, var direction)
 {
-
-	//if player is inside, automatically deny jumping:
 	if (UI_is_pc_inside())
 	{
-		UI_error_message("Avatar is inside, abort jumping");
 		return true;
-	}	
-	
+	}
+
+	var avatar_shape = UI_get_item_shape(AVATAR);
 	var start_x = start_position[X];
 	var start_y = start_position[Y];
+	var start_z = start_position[Z];
 	var dx = 0;
 	var dy = 0;
-	var range = 0;
-	var i = 1;
-	const int SHAPE = 439; //CHIMNEY = z axis 2
-	const int MAX_JUMP_HEIGHT = 0; //z level jump height, change as needed
+	var i = 0;
+	var step_count = 6;
+	var jump_profile = [1, 2, 3, 2, 1, 0];
 
 	if (direction == EAST)
 	{
 		dx = 1;
 		dy = 0;
-		range = destination[X] - start_x;
 	}
 	else if (direction == WEST)
 	{
 		dx = -1;
 		dy = 0;
-		range = start_x - destination[X];
 	}
 	else if (direction == NORTH)
 	{
 		dx = 0;
 		dy = 1;
-		range = destination[Y] - start_y;
 	}
 	else if (direction == SOUTH)
 	{
 		dx = 0;
 		dy = -1;
-		range = start_y - destination[Y];
 	}
 	else
 	{
-		UI_error_message("Invalid jump direction");
 		return true;
 	}
 
-	while (i <= range)
+	while (i < step_count)
 	{
-		var probe_x = start_x + (i * dx);
-		var probe_y = start_y + (i * dy);
+		var step_index = i + 1;
+		var probe_x = start_x + (step_index * dx);
+		var probe_y = start_y + (step_index * dy);
+		var arc_z = start_z + jump_profile[i];
 
-		if (UI_is_not_blocked([probe_x, probe_y, MAX_JUMP_HEIGHT], SHAPE, FRAME_ANY))
+		// Body clearance at current jump arc z.
+		if (!UI_is_not_blocked([probe_x, probe_y, arc_z], avatar_shape, FRAME_ANY))
 		{
-			UI_error_message("No impassible object located at " + probe_x + ", " + probe_y);
-		}
-		else //something is blocking the jump, no need to check the rest
-		{
-			UI_error_message("An impassible object located at " + probe_x + ", " + probe_y);
 			return true;
 		}
+
+		// Near the end of the jump, also validate the tile can be landed on.
+		if (i >= (step_count - 2))
+		{
+			var end_probe = [probe_x, probe_y, start_z];
+			if (!canLandAt(end_probe, start_z))
+			{
+				return true;
+			}
+		}
+
 		i += 1;
 	}
 
-	if (!canLandAt(destination, start_position[Z]))
+	if (!canLandAt(destination, start_z))
 	{
-		UI_error_message("Landing validation failed at " + destination[X] + ", " + destination[Y]);
 		return true;
 	}
 
@@ -141,38 +142,26 @@ void wand shape#(476) ()
 	var desX = position[X];
 	var desY = position[Y];
 	var desZ = position[Z];
+	var jump_steps = 6;
 	if (direction == EAST)
-		desX = position[X] + 5;
+		desX = position[X] + jump_steps;
 	else if (direction == WEST)
-		desX = position[X] - 5;
+		desX = position[X] - jump_steps;
 	else if (direction == NORTH)
-		desY = position[Y] + 5;
+		desY = position[Y] + jump_steps;
 	else if (direction == SOUTH)
-		desY = position[Y] - 5;
+		desY = position[Y] - jump_steps;
 	else
 		UI_error_message("Something went wrong - direction not found.");
 	destination = [desX, desY, desZ];
-		
-	UI_error_message("Destination x is " + destination[X] + ", " + destination[Y] + ", " + destination[Z]);
+
 	UI_close_gumps();
 	
-	//determines if location can be jumped too (no obstacles higher than 2 z axis
-	var is_blocked; 
-	
-	//check the destination Z levels up to 2 to see if it is "jumpable".  Increments Z up to 2
-	while (desZ < 3)
-	{
-		is_blocked = isPositionBlocked(position, destination, direction);
-		if (is_blocked)
-			say("Landing position blocked at coordinates: " + destination[X] + ", " + destination[Y] + ", " + destination[Z]); 
-		desZ += 1; 
-		destination = [desX, desY, desZ];
-	
-	}
+	// Determines if location can be jumped to with the scripted arc.
+	var is_blocked = isPositionBlocked(position, destination, direction);
 	
 	if (!is_blocked)
 	{
-		var descend_Z = 3 - desZ;
 		script AVATAR
 		{
 			actor frame bowing; 
@@ -183,12 +172,12 @@ void wand shape#(476) ()
 			step direction; 
 			rise;
 			step direction; 
-			
-			repeat descend_Z
-			{
-				descent;
-				step direction; 
-			};
+			descent;
+			step direction; 
+			descent;
+			step direction; 
+			descent;
+			step direction; 
 		
 			actor frame bowing; 
 			actor frame standing; 
