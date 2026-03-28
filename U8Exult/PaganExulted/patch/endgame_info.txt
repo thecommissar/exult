@@ -1,0 +1,22 @@
+#	Intro files
+
+%%section version
+:1
+%%endsection
+%%section scene
+:flic/0/0
+:ogg/2/119/0/1
+:wave/5/35966/0/0
+:wave/3/35973/0/0
+%%endsection
+%%section scene
+:flic/1/0
+:wave/3/1324/0/0
+:wave/4/2224/0/0
+:wave/3/7924/0/0
+:voc/6/8784/0/0
+:wave/4/9227/0/0
+:wave/3/11857/0/0
+:voc/7/14624/0/0
+:voc/8/14625/0/0
+%%endsection

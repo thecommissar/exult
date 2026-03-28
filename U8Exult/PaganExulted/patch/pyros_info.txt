@@ -1,0 +1,6 @@
+%%section version
+:1
+%%endsection
+%%section scene
+:flic/0/0
+%%endsection

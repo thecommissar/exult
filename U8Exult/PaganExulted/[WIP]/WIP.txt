@@ -1,0 +1,3 @@
+This folder and any subfolders are for work-in-progress files only.
+
+Nothing here is part of the main project.

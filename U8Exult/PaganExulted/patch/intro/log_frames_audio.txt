@@ -1,0 +1,398 @@
+SKFPlayer: PNG export enabled - frames will be saved as skf_frame_XXXXXX.png
+SKFPlayer: Audio export enabled - embedded audio will be saved as skf_audio_XXXX.wav
+SKFPlayer: External SFX export enabled - external sound effects will be saved as skf_external_sfx_XXXX.wav
+SKFPlayer: Frame timing logging enabled
+SKFPlayer: Audio timing will be logged relative to third frame (skf_frame_000002.png), then switching to frame 157 (skf_frame_000156.png)
+2025-07-28 22:46:41.953 pentagram[11045:100148225] NSKeyBindingManager: Bad key binding selector for '^z' = 'undo:'
+Frame 0 total display time: 2117ms
+Frame 1 total display time: 6213ms
+Frame 2 total display time: 4221ms
+*** REFERENCE TIME SET: Third frame (skf_frame_000002.png) displayed at 13997ms ***
+Frame 3 - Playing music track 49 (from external music file) (+871ms after third frame)
+Frame 3 - Playing sound effect 91 (from external SFX file) (+871ms after third frame)
+  -> Saving external SFX 91 to skf_external_sfx_0091.wav
+  -> Saving audio to skf_external_sfx_0091.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit raw, 33908 bytes
+  -> External SFX exported: 11111Hz, mono, 8-bit, 33908 bytes
+Frame 3 - Playing embedded audio from SKF object 337 (+5574ms after third frame)
+  -> Saving audio to skf_audio_0000.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit signed->unsigned, 29772 bytes
+  -> Audio format: 11111Hz, mono, size: 29772 bytes
+Frame 3 - Subtitle displayed: "You have been a thorn in my side for far too long, Avatar..." at Y=20
+Frame 3 - Playing embedded audio from SKF object 339 (+8171ms after third frame)
+  -> Saving audio to skf_audio_0001.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit signed->unsigned, 39354 bytes
+  -> Audio format: 11111Hz, mono, size: 39354 bytes
+SetSpeed 12
+Frame 3 total display time: 12546ms
+Frame 4 - Subtitles cleared
+Frame 4 - Playing sound effect 33 (from external SFX file) (+12671ms after third frame)
+  -> Saving external SFX 33 to skf_external_sfx_0033.wav
+  -> Saving audio to skf_external_sfx_0033.wav
+  -> WAV file saved: 9009Hz, 1 channel(s), 8-bit raw, 24000 bytes
+  -> External SFX exported: 9009Hz, mono, 8-bit, 24000 bytes
+Frame 4 total display time: 140ms
+Frame 5 total display time: 127ms
+Frame 6 total display time: 132ms
+Frame 7 total display time: 134ms
+Frame 8 - Playing sound effect 35 (from external SFX file) (+13204ms after third frame)
+  -> Saving external SFX 35 to skf_external_sfx_0035.wav
+  -> Saving audio to skf_external_sfx_0035.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit raw, 21290 bytes
+  -> External SFX exported: 11111Hz, mono, 8-bit, 21290 bytes
+Frame 8 total display time: 333ms
+SetSpeed 15
+Frame 9 total display time: 134ms
+Frame 10 total display time: 133ms
+Frame 11 - Playing sound effect 102 (from external SFX file) (+13804ms after third frame)
+Failed to get external SFX sample 102
+Frame 11 total display time: 134ms
+Frame 12 total display time: 132ms
+Frame 13 total display time: 105ms
+Frame 14 total display time: 129ms
+Frame 15 total display time: 133ms
+Frame 16 total display time: 137ms
+Frame 17 total display time: 130ms
+Frame 18 total display time: 133ms
+Frame 19 - Playing sound effect 91 (from external SFX file) (+14839ms after third frame)
+  -> Saving external SFX 91 to skf_external_sfx_0091.wav
+  -> Saving audio to skf_external_sfx_0091.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit raw, 33908 bytes
+  -> External SFX exported: 11111Hz, mono, 8-bit, 33908 bytes
+Frame 19 total display time: 141ms
+Frame 20 total display time: 126ms
+Frame 21 total display time: 133ms
+Frame 22 total display time: 167ms
+Frame 23 - Playing embedded audio from SKF object 341 (+15403ms after third frame)
+  -> Saving audio to skf_audio_0002.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit signed->unsigned, 28352 bytes
+  -> Audio format: 11111Hz, mono, size: 28352 bytes
+Frame 23 - Subtitle displayed: "Your two worlds will be crushed... Britannia first, then Earth!" at Y=20
+Frame 23 total display time: 133ms
+Frame 24 total display time: 1012ms
+Frame 25 total display time: 62ms
+Frame 26 total display time: 69ms
+Frame 27 total display time: 64ms
+Frame 28 total display time: 69ms
+Frame 29 total display time: 70ms
+Frame 30 total display time: 60ms
+Frame 31 total display time: 68ms
+Frame 32 total display time: 71ms
+Frame 33 total display time: 60ms
+Frame 34 total display time: 71ms
+Frame 35 total display time: 65ms
+Frame 36 total display time: 67ms
+Frame 37 total display time: 68ms
+Frame 38 total display time: 63ms
+Frame 39 total display time: 132ms
+Frame 40 total display time: 138ms
+Frame 41 total display time: 132ms
+Frame 42 - Playing embedded audio from SKF object 343 (+17887ms after third frame)
+  -> Saving audio to skf_audio_0003.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit signed->unsigned, 42292 bytes
+  -> Audio format: 11111Hz, mono, size: 42292 bytes
+Frame 42 total display time: 145ms
+Frame 43 total display time: 118ms
+Frame 44 total display time: 143ms
+Frame 45 total display time: 128ms
+Frame 46 total display time: 131ms
+Frame 47 total display time: 132ms
+Frame 48 total display time: 133ms
+Frame 49 total display time: 134ms
+Frame 50 total display time: 133ms
+Frame 51 total display time: 138ms
+SetSpeed 12
+Frame 52 total display time: 129ms
+Frame 53 total display time: 141ms
+Frame 54 total display time: 132ms
+Frame 55 total display time: 133ms
+Frame 56 total display time: 103ms
+Frame 57 total display time: 158ms
+Frame 58 total display time: 139ms
+Frame 59 total display time: 98ms
+Frame 60 total display time: 136ms
+Frame 61 total display time: 129ms
+Frame 62 total display time: 139ms
+Frame 63 total display time: 128ms
+Frame 64 total display time: 132ms
+Frame 65 total display time: 134ms
+Frame 66 total display time: 132ms
+Frame 67 total display time: 132ms
+Frame 68 total display time: 134ms
+Frame 69 total display time: 132ms
+Frame 70 total display time: 143ms
+Frame 71 total display time: 133ms
+Frame 72 total display time: 131ms
+Frame 73 total display time: 135ms
+Frame 74 - Subtitles cleared
+Frame 74 - Playing embedded audio from SKF object 345 (+22116ms after third frame)
+  -> Saving audio to skf_audio_0004.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit signed->unsigned, 48360 bytes
+  -> Audio format: 11111Hz, mono, size: 48360 bytes
+Frame 74 - Subtitle displayed: "I shall parade you before their conquered peoples, as the fallen idol of a pathetic ideal!" at Y=20
+Frame 74 total display time: 135ms
+Frame 75 total display time: 131ms
+Frame 76 total display time: 132ms
+Frame 77 total display time: 134ms
+Frame 78 total display time: 133ms
+Frame 79 total display time: 103ms
+Frame 80 total display time: 158ms
+Frame 81 total display time: 142ms
+Frame 82 total display time: 132ms
+Frame 83 total display time: 132ms
+Frame 84 total display time: 99ms
+Frame 85 total display time: 168ms
+Frame 86 total display time: 102ms
+Frame 87 total display time: 133ms
+Frame 88 total display time: 129ms
+Frame 89 total display time: 131ms
+Frame 90 total display time: 131ms
+Frame 91 total display time: 142ms
+Frame 92 total display time: 133ms
+Frame 93 total display time: 134ms
+Frame 94 total display time: 131ms
+Frame 95 total display time: 134ms
+Frame 96 total display time: 131ms
+Frame 97 total display time: 134ms
+Frame 98 total display time: 134ms
+Frame 99 total display time: 131ms
+Frame 100 total display time: 132ms
+Frame 101 total display time: 131ms
+Frame 102 total display time: 138ms
+Frame 103 total display time: 132ms
+Frame 104 total display time: 133ms
+Frame 105 total display time: 133ms
+Frame 106 - Playing embedded audio from SKF object 347 (+26349ms after third frame)
+  -> Saving audio to skf_audio_0005.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit signed->unsigned, 41277 bytes
+  -> Audio format: 11111Hz, mono, size: 41277 bytes
+Frame 106 total display time: 140ms
+Frame 107 total display time: 97ms
+Frame 108 total display time: 168ms
+Frame 109 total display time: 134ms
+Frame 110 total display time: 93ms
+Frame 111 total display time: 141ms
+Frame 112 total display time: 131ms
+Frame 113 total display time: 131ms
+Frame 114 total display time: 131ms
+Frame 115 total display time: 141ms
+Frame 116 total display time: 130ms
+Frame 117 total display time: 134ms
+Frame 118 total display time: 131ms
+Frame 119 total display time: 132ms
+Frame 120 total display time: 132ms
+Frame 121 total display time: 133ms
+Frame 122 total display time: 134ms
+Frame 123 total display time: 135ms
+Frame 124 total display time: 134ms
+Frame 125 total display time: 131ms
+Frame 126 total display time: 136ms
+Frame 127 total display time: 133ms
+Frame 128 total display time: 134ms
+Frame 129 total display time: 134ms
+Frame 130 total display time: 103ms
+Frame 131 total display time: 132ms
+Frame 132 total display time: 167ms
+Frame 133 total display time: 132ms
+Frame 134 total display time: 101ms
+Frame 135 total display time: 131ms
+Frame 136 total display time: 135ms
+Frame 137 total display time: 134ms
+Frame 138 - Subtitles cleared
+Frame 138 total display time: 131ms
+Frame 139 - Playing sound effect 91 (from external SFX file) (+30679ms after third frame)
+  -> Saving external SFX 91 to skf_external_sfx_0091.wav
+  -> Saving audio to skf_external_sfx_0091.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit raw, 33908 bytes
+  -> External SFX exported: 11111Hz, mono, 8-bit, 33908 bytes
+Frame 139 total display time: 138ms
+Frame 140 total display time: 129ms
+Frame 141 total display time: 128ms
+Frame 142 total display time: 136ms
+Frame 143 total display time: 133ms
+Frame 144 total display time: 134ms
+Frame 145 - Playing sound effect 92 (from external SFX file) (+31475ms after third frame)
+  -> Saving external SFX 92 to skf_external_sfx_0092.wav
+  -> Saving audio to skf_external_sfx_0092.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit raw, 40250 bytes
+  -> External SFX exported: 11111Hz, mono, 8-bit, 40250 bytes
+Frame 145 total display time: 139ms
+Frame 146 total display time: 124ms
+Frame 147 total display time: 141ms
+Frame 148 total display time: 131ms
+Frame 149 total display time: 130ms
+Frame 150 total display time: 132ms
+Frame 151 total display time: 143ms
+Frame 152 - Playing music track 50 (from external music file) (+32408ms after third frame)
+Frame 152 total display time: 123ms
+Frame 153 total display time: 133ms
+Frame 154 total display time: 141ms
+Frame 155 total display time: 127ms
+Frame 156 total display time: 138ms
+*** NEW REFERENCE TIME SET: Frame 157 (skf_frame_000156.png) displayed at 46954ms ***
+*** Audio timing will now be logged relative to frame 157 instead of third frame ***
+SetSpeed 12
+Frame 157 total display time: 135ms
+Frame 158 total display time: 99ms
+Frame 159 total display time: 165ms
+Frame 160 total display time: 135ms
+Frame 161 total display time: 96ms
+Frame 162 total display time: 136ms
+Frame 163 total display time: 129ms
+Frame 164 total display time: 140ms
+Frame 165 total display time: 129ms
+Frame 166 total display time: 139ms
+Frame 167 total display time: 134ms
+Frame 168 total display time: 130ms
+Frame 169 total display time: 130ms
+Frame 170 total display time: 133ms
+Frame 171 total display time: 140ms
+Frame 172 - Playing embedded audio from SKF object 349 (+2085ms after frame 157)
+  -> Saving audio to skf_audio_0006.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit signed->unsigned, 46883 bytes
+  -> Audio format: 11111Hz, mono, size: 46883 bytes
+Frame 172 - Subtitle displayed: "I banish you to the world of Pagan!" at Y=20
+Frame 172 total display time: 127ms
+Frame 173 total display time: 135ms
+Frame 174 total display time: 137ms
+Frame 175 total display time: 126ms
+Frame 176 total display time: 140ms
+Frame 177 total display time: 127ms
+Frame 178 total display time: 137ms
+Frame 179 total display time: 130ms
+Frame 180 total display time: 141ms
+Frame 181 total display time: 133ms
+Frame 182 total display time: 98ms
+Frame 183 total display time: 135ms
+Frame 184 total display time: 131ms
+Frame 185 total display time: 131ms
+Frame 186 total display time: 131ms
+Frame 187 total display time: 140ms
+Frame 188 total display time: 132ms
+Frame 189 total display time: 130ms
+Frame 190 total display time: 130ms
+Frame 191 total display time: 140ms
+Frame 192 total display time: 128ms
+Frame 193 total display time: 139ms
+Frame 194 total display time: 127ms
+Frame 195 total display time: 139ms
+Frame 196 total display time: 130ms
+Frame 197 total display time: 138ms
+Frame 198 total display time: 130ms
+Frame 199 total display time: 130ms
+Frame 200 total display time: 138ms
+Frame 201 total display time: 128ms
+Frame 202 total display time: 138ms
+Frame 203 total display time: 129ms
+Frame 204 total display time: 142ms
+Frame 205 total display time: 99ms
+Frame 206 total display time: 164ms
+Frame 207 total display time: 101ms
+Frame 208 total display time: 168ms
+Frame 209 total display time: 100ms
+Frame 210 total display time: 129ms
+Frame 211 - Playing sound effect 77 (from external SFX file) (+7227ms after frame 157)
+  -> Saving external SFX 77 to skf_external_sfx_0077.wav
+  -> Saving audio to skf_external_sfx_0077.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit raw, 22528 bytes
+  -> External SFX exported: 11111Hz, mono, 8-bit, 22528 bytes
+Frame 211 - Subtitles cleared
+Frame 211 - Playing sound effect 112 (from external SFX file) (+7232ms after frame 157)
+  -> Saving external SFX 112 to skf_external_sfx_0112.wav
+  -> Saving audio to skf_external_sfx_0112.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit raw, 14009 bytes
+  -> External SFX exported: 11111Hz, mono, 8-bit, 14009 bytes
+Frame 211 total display time: 148ms
+Frame 212 total display time: 119ms
+Frame 213 total display time: 131ms
+Frame 214 total display time: 132ms
+Frame 215 total display time: 140ms
+Frame 216 total display time: 131ms
+Frame 217 total display time: 129ms
+Frame 218 total display time: 138ms
+Frame 219 total display time: 135ms
+Frame 220 total display time: 136ms
+Frame 221 total display time: 129ms
+SetSpeed 10
+Frame 222 total display time: 129ms
+Frame 223 total display time: 140ms
+Frame 224 total display time: 127ms
+Frame 225 total display time: 137ms
+Frame 226 total display time: 132ms
+Frame 227 total display time: 137ms
+Frame 228 total display time: 130ms
+Frame 229 total display time: 137ms
+Frame 230 total display time: 101ms
+Frame 231 total display time: 161ms
+Frame 232 - Playing embedded audio from SKF object 351 (+10027ms after frame 157)
+  -> Saving audio to skf_audio_0007.wav
+  -> WAV file saved: 11111Hz, 1 channel(s), 8-bit signed->unsigned, 43849 bytes
+  -> Audio format: 11111Hz, mono, size: 43849 bytes
+Frame 232 - Subtitle displayed: "No one here knows of the AVATAR!" at Y=100
+Frame 232 total display time: 142ms
+Frame 233 total display time: 122ms
+Frame 234 total display time: 133ms
+Frame 235 total display time: 140ms
+Frame 236 total display time: 101ms
+Frame 237 total display time: 129ms
+Frame 238 total display time: 139ms
+Frame 239 total display time: 132ms
+Frame 240 total display time: 127ms
+Frame 241 total display time: 137ms
+Frame 242 total display time: 138ms
+Frame 243 total display time: 128ms
+Frame 244 total display time: 130ms
+Frame 245 total display time: 140ms
+Frame 246 total display time: 128ms
+Frame 247 total display time: 139ms
+Frame 248 total display time: 129ms
+Frame 249 total display time: 134ms
+Frame 250 total display time: 129ms
+Frame 251 total display time: 140ms
+SetSpeed 20
+Frame 252 total display time: 130ms
+Frame 253 total display time: 138ms
+Frame 254 total display time: 131ms
+Frame 255 total display time: 141ms
+Frame 256 total display time: 129ms
+Frame 257 total display time: 97ms
+Frame 258 total display time: 137ms
+Frame 259 total display time: 127ms
+Frame 260 - Subtitles cleared
+Frame 260 - Playing music track 51 (from external music file) (+13689ms after frame 157)
+Frame 260 total display time: 135ms
+Frame 261 total display time: 1198ms
+Frame 262 total display time: 140ms
+Frame 263 total display time: 131ms
+Frame 264 total display time: 130ms
+Frame 265 total display time: 130ms
+Frame 266 total display time: 139ms
+Frame 267 total display time: 128ms
+Frame 268 total display time: 140ms
+Frame 269 total display time: 131ms
+Frame 270 total display time: 132ms
+Frame 271 total display time: 134ms
+Frame 272 total display time: 133ms
+Frame 273 total display time: 129ms
+Frame 274 total display time: 110ms
+Frame 275 total display time: 1198ms
+Frame 276 total display time: 128ms
+Frame 277 total display time: 135ms
+Frame 278 total display time: 136ms
+Frame 279 total display time: 132ms
+Frame 280 total display time: 134ms
+Frame 281 total display time: 132ms
+Frame 282 total display time: 133ms
+Frame 283 total display time: 131ms
+Frame 284 total display time: 4173ms
+Frame 285 total display time: 99ms
+Frame 286 total display time: 135ms
+Frame 287 total display time: 158ms
+Frame 288 total display time: 109ms
+Frame 289 total display time: 132ms
+Frame 290 total display time: 128ms
+Frame 291 total display time: 140ms
+Frame 292 total display time: 129ms
+Frame 293 - SlowStopMusic (+28230ms after frame 157)
+Frame 293 - SlowStopMusic (+28230ms after frame 157)
+Frame 293 total display time: 4174ms

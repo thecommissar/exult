@@ -1,0 +1,19 @@
+#	Exult 1.13.1git text message file.	Written by ExultStudio.
+%%section version
+:2
+%%endsection
+%%section bodylist
+:1036/0/31
+:1072/0/19
+:1078/0/19
+:1186/0/19
+:1187/0/19
+:1188/0/26
+:1189/0/26
+:1190/0/26
+:1191/0/26
+:1192/0/26
+:1194/0/26
+:1195/0/26
+:1207/0/19
+%%endsection

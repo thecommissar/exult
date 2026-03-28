@@ -1,0 +1,37 @@
+#	Intro files
+
+
+%%section version
+:1
+%%endsection
+%%section scene
+:flic/0/0
+%%endsection
+%%section scene
+:flic/1/0
+:ogg/4/856/0/0
+:wave/10/300/0/0
+:voc/13/5556/0/0
+:subtitle/3/5556/001/0/0/2/6221
+:wave/7/12656/0/0
+:wave/8/13190/0/0
+:wave/12/13790/0/0
+:wave/10/14856/0/0
+:voc/14/15389/0/0
+:subtitle/3/15389/002/0/0/2/6385
+:voc/15/22091/0/0
+:subtitle/3/22091/003/0/0/2/8067
+:wave/10/30690/0/0
+:wave/11/31350/0/1
+%%endsection
+%%section scene
+:flic/2/0
+:ogg/5/0/13726/0
+:voc/16/2124/0/0
+:subtitle/3/2124/004/0/0/1/4220
+:wave/9/7257/0/0
+:wave/12/7263/0/0
+:voc/17/10024/0/0
+:subtitle/3/10024/005/0/0/1/3946
+:ogg/6/13723/0/0
+%%endsection

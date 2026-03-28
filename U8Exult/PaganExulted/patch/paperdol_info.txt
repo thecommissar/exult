@@ -1,0 +1,8 @@
+#	Exult 1.13.1git text message file.	Written by ExultStudio.
+%%section version
+:3
+%%endsection
+%%section characters
+:1072/0/0/14/0/126/0/1/7/1/3/5
+:1186/0/0/14/0/126/0/1/7/1/3/5
+%%endsection

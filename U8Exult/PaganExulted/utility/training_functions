@@ -1,0 +1,51 @@
+
+
+//To train in stats where an attribute is changed by a standard number with no other calculations (ex: str + 2)
+var trainStats(var npc, var stat_type, var change)
+{
+	var training_points = UI_get_npc_prop(npc, TRAINING);
+	var npc_stat = UI_get_npc_prop(npc, stat_type);
+
+	//if stat plus change is over 30, return training point and set to 30
+	if (npc_stat + change >= 30)
+	{
+		var excess = npc_stat + change - 30; // Calculate excess points
+        UI_set_npc_prop(npc, stat_type, 30); // Set stat to the maximum of 30
+        training_points += excess; // Return unused training points
+        UI_set_npc_prop(npc, TRAINING, training_points); // Update training poin
+	
+	}
+	else
+	{
+        // Apply the stat change if within limits
+        UI_set_npc_prop(npc, stat_type, npc_stat + change);
+        UI_set_npc_prop(npc, TRAINING, training_points - change);
+    }
+	
+
+}
+
+
+//use this if you want to train with the "rubber-band formula" for Combat. 
+var trainCombat(var npc)
+{
+
+	//determine how much Combat Avatar has. Adding it based on "rubber band" formula used in U7 for combat and magic:
+	//(NPC's Dex - NPC's combat)+1) / 2.		
+	
+	//get Dex and combat skill, then calculate
+	var npc_combat = UI_get_npc_prop(npc, COMBAT);
+	var npc_dex = UI_get_npc_prop(npc, DEXTERITY);
+	var combat_bonus = (npc_dex - npc_combat + 1) / 2;
+	
+	UI_set_npc_prop(npc, COMBAT, combat_bonus);
+	
+	//get new combat
+	npc_combat = UI_get_npc_prop(npc, COMBAT);
+	
+	//subtract training points
+	UI_set_npc_prop(npc, TRAINING, -1);
+	UI_error_message("Combat points added to npo is  " + npc_combat_bonus. NPC's combat is now " + npc_combat);
+	
+	
+}

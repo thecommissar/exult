@@ -1,0 +1,39 @@
+//necromancyGrantPeace.uc
+//Placeholder for Grant Peace spell (Shape 1087, Frame 8)
+
+void necromancyGrantPeace object#() () {
+    UI_error_message("necromancyGrantPeace executing");
+
+    var caster = item;
+    var curMana = caster->get_npc_prop(MANA);
+    UI_error_message("Mana before casting: " + curMana);
+
+    // Placeholder mana cost - adjust as needed
+    if (curMana < 5) {
+        caster->item_say("@Not enough mana...@");
+        UI_error_message("Not enough mana to cast Grant Peace - return");
+        return;
+    }
+
+    caster->set_npc_prop(MANA, -5);
+    UI_error_message("Begin Animation and Effects");
+    caster->item_say("@In Vas Corp@");
+
+    // Basic animation sequence
+    script caster {
+        nohalt;
+        actor frame CAST_1;
+        actor frame CAST_2;
+        sfx 67;
+        wait 4;
+        actor frame STAND;
+    }
+    UI_error_message("End Animation and Effects");
+
+    // TODO: Add specific spell logic for Grant Peace here
+    UI_error_message("Placeholder: Grant Peace spell effect not implemented");
+
+    // Remove the talisman after successful cast
+    item->remove_item();
+    UI_error_message("Talisman (Shape 1087, Frame 8) removed");
+}
