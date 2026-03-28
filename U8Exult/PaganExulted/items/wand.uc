@@ -54,19 +54,10 @@ var evaluateLanding(var destination, var avatar_z)
 	return [true, destination, ""];
 }
 
-// Build ordered jump nodes and their z-offset profile for a fixed-range jump.
-var buildForwardJumpPathNodes(var start_position, var direction, var range, var arc_profile)
+var getForwardJumpDelta(var direction)
 {
-	if (range != 6 || UI_get_array_size(arc_profile) != 6)
-	{
-		return [[], []];
-	}
-
 	var dx = 0;
 	var dy = 0;
-	var start_x = start_position[X];
-	var start_y = start_position[Y];
-	var start_z = start_position[Z];
 
 	if (direction == EAST)
 	{
@@ -90,28 +81,20 @@ var buildForwardJumpPathNodes(var start_position, var direction, var range, var 
 	}
 	else
 	{
-		return [[], []];
+		return [false, 0, 0];
 	}
 
-	var ordered_tiles = [
-		[start_x + dx, start_y + dy, start_z + arc_profile[1]],
-		[start_x + (2 * dx), start_y + (2 * dy), start_z + arc_profile[2]],
-		[start_x + (3 * dx), start_y + (3 * dy), start_z + arc_profile[3]],
-		[start_x + (4 * dx), start_y + (4 * dy), start_z + arc_profile[4]],
-		[start_x + (5 * dx), start_y + (5 * dy), start_z + arc_profile[5]],
-		[start_x + (6 * dx), start_y + (6 * dy), start_z + arc_profile[6]]
-	];
+	return [true, dx, dy];
+}
 
-	var z_offsets = [
-		arc_profile[1],
-		arc_profile[2],
-		arc_profile[3],
-		arc_profile[4],
-		arc_profile[5],
-		arc_profile[6]
-	];
+var reportBlocked(var tx, var ty, var destination)
+{
+	return [false, destination, "Path blocked at [" + tx + ", " + ty + "]"];
+}
 
-	return [ordered_tiles, z_offsets];
+var reportClearStep(var tx, var ty)
+{
+	return [true, tx, ty];
 }
 
 // Validation phase: indoor check, path collision checks, and landing standability.
@@ -124,23 +107,36 @@ var validateForwardJump(var start_position, var destination, var direction, var 
 
 	var avatar_shape = UI_get_item_shape(AVATAR);
 	var start_z = start_position[Z];
-	var i = 0;
-	var path_plan = buildForwardJumpPathNodes(start_position, direction, range, arc_profile);
-	var ordered_tiles = path_plan[1];
+	var start_x = start_position[X];
+	var start_y = start_position[Y];
+	var step = 1;
+	var direction_delta = getForwardJumpDelta(direction);
 
-	if (UI_get_array_size(ordered_tiles) != range)
+	if (!direction_delta[1])
 	{
 		return [false, destination, "Cannot jump that direction"];
 	}
 
-	while (i < UI_get_array_size(ordered_tiles))
+	var dx = direction_delta[2];
+	var dy = direction_delta[3];
+
+	if (UI_get_array_size(arc_profile) != range)
 	{
-		var planned_node = ordered_tiles[i + 1];
+		return [false, destination, "Invalid jump profile"];
+	}
+
+	while (step <= range)
+	{
+		var tx = start_x + (step * dx);
+		var ty = start_y + (step * dy);
+		var planned_node = [tx, ty, start_z + arc_profile[step]];
+
 		if (!UI_is_not_blocked(planned_node, avatar_shape, FRAME_ANY))
 		{
-			return [false, destination, "Path blocked"];
+			return reportBlocked(tx, ty, destination);
 		}
-		i += 1;
+		reportClearStep(tx, ty);
+		step += 1;
 	}
 
 	var landing_validation = evaluateLanding(destination, start_z);
@@ -163,21 +159,20 @@ void wand shape#(476) ()
 	var direction = getFacing(AVATAR);
 	var position = UI_get_object_position(AVATAR);
 	var destination; //get tile Avatar is going to land on:
-	var desX = position[X];
-	var desY = position[Y];
-	var desZ = position[Z];
 	var jump_steps = 6;
-	if (direction == EAST)
-		desX = position[X] + jump_steps;
-	else if (direction == WEST)
-		desX = position[X] - jump_steps;
-	else if (direction == NORTH)
-		desY = position[Y] + jump_steps;
-	else if (direction == SOUTH)
-		desY = position[Y] - jump_steps;
-	else
+	var direction_delta = getForwardJumpDelta(direction);
+	if (!direction_delta[1])
+	{
 		UI_error_message("Something went wrong - direction not found.");
-	destination = [desX, desY, desZ];
+		return;
+	}
+	var dx = direction_delta[2];
+	var dy = direction_delta[3];
+	destination = [
+		position[X] + (jump_steps * dx),
+		position[Y] + (jump_steps * dy),
+		position[Z]
+	];
 
 	UI_close_gumps();
 	
