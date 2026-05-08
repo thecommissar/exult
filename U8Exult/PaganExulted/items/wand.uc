@@ -1,129 +1,156 @@
 /*
- * Forward jump wand.
+ * Forward Jump Wand (usecode-only)
  *
- * Shape 476 is bound to SPACE in patch/patchkeys.txt.  This stays pure usecode:
- * no engine helpers, no new data files, and no mouse target.
+ * Design goals:
+ * - Non-targeted jump: always jump forward in facing direction.
+ * - Basic collision checks: don't jump through blocked tiles.
+ * - Landing checks: allow platforms above water; deny water-only landing.
+ * - No engine changes required.
  */
 
-var u8eGetFacingDelta(var direction)
+var getForwardJumpDelta(var direction)
 {
 	if (direction == EAST)
-		return [1, 0];
+		return [true, 1, 0];
 	else if (direction == WEST)
-		return [-1, 0];
+		return [true, -1, 0];
 	else if (direction == NORTH)
-		return [0, -1];
+		return [true, 0, 1];
 	else if (direction == SOUTH)
-		return [0, 1];
+		return [true, 0, -1];
 
-	return [0, 0];
+	return [false, 0, 0];
 }
 
-var u8eCanLandAvatar(var x, var y, var z)
+var getJumpPathProfile()
 {
-	/*
-	 * Use the canonical Avatar shape for collision dimensions.  The redirected
-	 * U8 avatar visuals may not carry reliable TFA collision data, while the SI
-	 * male/female Avatar shapes are both 1x1x4.
-	 */
-	const int AVATAR_COLLISION_SHAPE = SHAPE_MALE_AVATAR;
-
-	if (z == 0 && UI_is_water([x, y, z]))
-		return false;
-
-	return UI_is_not_blocked([x, y, z], AVATAR_COLLISION_SHAPE, 0);
+	// 6 forward steps; relative z offset for collision probes.
+	return [1, 2, 3, 2, 1, 0];
 }
 
-var u8eFindJumpLanding(var avatar, var start_pos, var direction)
+var probeStandableAt(var avatar, var x, var y, var check_z)
 {
-	var delta = u8eGetFacingDelta(direction);
-	var dx = delta[1];
-	var dy = delta[2];
+	var start_pos = UI_get_object_position(avatar);
+	var start_z = UI_get_lift(avatar);
 
-	if (dx == 0 && dy == 0)
-		return [0, start_pos, "I can't jump that way"];
+	UI_move_object(avatar, [x, y, check_z], 0);
+	var moved = UI_get_object_position(avatar);
+	var moved_z = UI_get_lift(avatar);
 
+	var ok = (moved[X] == x && moved[Y] == y && moved_z == check_z);
+
+	// Always restore avatar position after probe.
+	UI_move_object(avatar, [start_pos[X], start_pos[Y], start_z], 0);
+
+	return ok;
+}
+
+var evaluateLanding(var avatar, var destination, var start_z)
+{
+	var dest_x = destination[X];
+	var dest_y = destination[Y];
+
+	const int UP_TOL = 2;
+	const int DOWN_TOL = 3;
+	const int MIN_Z = 0;
+	const int MAX_Z = 7;
+
+	var z = start_z + UP_TOL;
+	while (z >= start_z - DOWN_TOL)
+	{
+		if (z >= MIN_Z && z <= MAX_Z)
+		{
+			if (probeStandableAt(avatar, dest_x, dest_y, z))
+			{
+				destination[Z] = z;
+				return [true, destination, ""];
+			}
+		}
+		z -= 1;
+	}
+
+	// Water denial only when no standable surface was found.
+	if (UI_is_water([dest_x, dest_y, start_z]))
+		return [false, destination, "No standable landing (water)"];
+
+	return [false, destination, "No standable landing"];
+}
+
+var validateForwardJump(var avatar, var start_pos, var direction, var destination)
+{
+	if (UI_is_pc_inside())
+		return [false, destination, "Not enough room indoors"];
+
+	var dir_delta = getForwardJumpDelta(direction);
+	if (!dir_delta[1])
+		return [false, destination, "Invalid facing direction"];
+
+	var dx = dir_delta[2];
+	var dy = dir_delta[3];
 	var start_x = start_pos[X];
 	var start_y = start_pos[Y];
 	var start_z = UI_get_lift(avatar);
+	var shape = UI_get_item_shape(avatar);
+	var profile = getJumpPathProfile();
+	var steps = UI_get_array_size(profile);
 
-	var min_z = start_z - 3;
-	if (min_z < 0)
-		min_z = 0;
-
-	var distance = 3;
-	while (distance >= 1)
+	var i = 1;
+	while (i <= steps)
 	{
-		var landing_x = start_x + (dx * distance);
-		var landing_y = start_y + (dy * distance);
-		var z = start_z + 3;
+		var tx = start_x + (dx * i);
+		var ty = start_y + (dy * i);
+		var probe_z = start_z + profile[i];
+		if (probe_z < 0)
+			probe_z = 0;
 
-		while (z >= min_z)
-		{
-			if (u8eCanLandAvatar(landing_x, landing_y, z))
-				return [1, [landing_x, landing_y, z], ""];
+		// If any tile in the arc is blocked, cancel jump.
+		if (!UI_is_not_blocked([tx, ty, probe_z], shape, FRAME_ANY))
+			return [false, destination, "Path blocked at [" + tx + ", " + ty + "]"];
 
-			z -= 1;
-		}
-
-		distance -= 1;
+		i += 1;
 	}
 
-	return [0, start_pos, "I can't jump there"];
+	return evaluateLanding(avatar, destination, start_z);
 }
 
-var u8eCreateJumpMarker(var landing_pos)
+var barkJumpFailure(var reason)
 {
-	const int JUMP_MARKER_SHAPE = 247;
-	const int SI_DONT_RENDER = 22;
-
-	var marker = UI_create_new_object(JUMP_MARKER_SHAPE);
-	if (!marker)
-		return false;
-
-	marker->set_item_flag(SI_DONT_RENDER);
-	marker->set_item_flag(TEMPORARY);
-	UI_update_last_created(landing_pos);
-
-	return marker;
+	delayedBark(AVATAR, "@I can't jump there. " + reason + ".@", 1);
 }
 
-void u8ePinAvatarToMarker object#() ()
+void wand shape#(476) ()
 {
-	var avatar = UI_get_avatar_ref();
-	var pos = UI_get_object_position(item);
-	UI_move_object(avatar, [pos[X], pos[Y], pos[Z]], 0);
-	UI_remove_item(item);
-	UI_set_camera(avatar);
-	UI_center_view(avatar);
-}
-
-var u8eBarkJumpFailure(var reason)
-{
-	delayedBark(AVATAR, "@" + reason + ".@", 1);
-}
-
-void u8eJumpForward(var avatar)
-{
+	var avatar = AVATAR;
 	var direction = getFacing(avatar);
 	var start_pos = UI_get_object_position(avatar);
-	var landing = u8eFindJumpLanding(avatar, start_pos, direction);
+	var dir_delta = getForwardJumpDelta(direction);
+
+	if (!dir_delta[1])
+	{
+		UI_error_message("Jump failed: invalid facing direction.");
+		return;
+	}
+
+	var dx = dir_delta[2];
+	var dy = dir_delta[3];
+	var jump_distance = 6;
+
+	var destination = [
+		start_pos[X] + (dx * jump_distance),
+		start_pos[Y] + (dy * jump_distance),
+		UI_get_lift(avatar)
+	];
 
 	UI_close_gumps();
 
-	if (!landing[1])
+	var validation = validateForwardJump(avatar, start_pos, direction, destination);
+	if (!validation[1])
 	{
-		u8eBarkJumpFailure(landing[3]);
+		barkJumpFailure(validation[3]);
 		return;
 	}
 
-	var landing_pos = landing[2];
-	var marker = u8eCreateJumpMarker(landing_pos);
-	if (!marker)
-	{
-		u8eBarkJumpFailure("I can't jump there");
-		return;
-	}
+	destination = validation[2];
 
 	script avatar
 	{
@@ -133,17 +160,15 @@ void u8eJumpForward(var avatar)
 		step direction;
 		rise;
 		step direction;
+		rise;
+		step direction;
 		descent;
 		step direction;
 		descent;
+		step direction;
+		descent;
+		step direction;
 		actor frame bowing;
 		actor frame standing;
 	}
-
-	script marker after 8 ticks call u8ePinAvatarToMarker;
-}
-
-void wand shape#(476) ()
-{
-	u8eJumpForward(UI_get_avatar_ref());
 }
