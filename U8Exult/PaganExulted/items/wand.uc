@@ -1,184 +1,149 @@
+/*
+ * Forward jump wand.
+ *
+ * Shape 476 is bound to SPACE in patch/patchkeys.txt.  This stays pure usecode:
+ * no engine helpers, no new data files, and no mouse target.
+ */
 
-//take Avatar's current location and destination to see if he can jump to it
-var isPositionBlocked(var start_position, var destination, var direction)
+var u8eGetFacingDelta(var direction)
 {
+	if (direction == EAST)
+		return [1, 0];
+	else if (direction == WEST)
+		return [-1, 0];
+	else if (direction == NORTH)
+		return [0, -1];
+	else if (direction == SOUTH)
+		return [0, 1];
 
-	//if player is inside, automatically deny jumping:
-	if (UI_is_pc_inside())
-	{
-		UI_error_message("Avatar is inside, abort jumping");
-		return true;
-	}	
-	//if destination tile is water, automatically deny jumping:
-	if (UI_is_water([destination]))
-	{
-		UI_error_message("Destination tile is water, abort jumping");	
-		return true;
-	}	
-	
-	var start_x = start_position[X];
-	var start_y = start_position[Y];
-	const int SHAPE = 439; //CHIMNEY = z axis 2
-	const int MAX_JUMP_HEIGHT = 0; //z level jump height, change as needed
-
-
-	
-	if (start_x < destination[X])
-		start_x = start_x + 1;
-	else if (start_y < destination[Y])	
-		start_y = start_y - 1;
-	else if (start_x > destination[X])
-		start_x = start_x - 1;
-	else // if (start_y > destination[Y])	
-		start_y = start_y + 1;
-	
-	
-	if (start_x < destination[X])
-	{
-		while (start_x < destination[X])
-		{
-			if (UI_is_not_blocked([start_x, start_y, MAX_JUMP_HEIGHT], SHAPE, FRAME_ANY))
-			{
-				UI_error_message("No impassible object located at " + start_x + ", " + start_y);
-				
-				
-			}	
-			else //something is blocking the jump, no need to check the rest
-			{
-				UI_error_message("An impassible object located at " + start_x + ", " + start_y);	
-				return true;
-			}	
-			start_x += 1;
-		}
-	
-	
-	}
-	else if (start_x > destination[X])
-	{
-		while (start_x > destination[X])
-		{
-			if (UI_is_not_blocked([start_x, start_y, MAX_JUMP_HEIGHT], SHAPE, FRAME_ANY))
-			{
-				UI_error_message("No impassible object located at " + start_x + ", " + start_y);
-				
-				
-			}	
-			else //something is blocking the jump, no need to check the rest
-			{
-				UI_error_message("An impassible object located at " + start_x + ", " + start_y);	
-				return true;
-			}	
-			start_x -= 1;
-		}
-	
-	
-	}
-	else if (start_y < destination[Y])
-	{
-		while (start_y < destination[Y])
-		{
-			if (UI_is_not_blocked([start_x, start_y, MAX_JUMP_HEIGHT], SHAPE, FRAME_ANY))
-			{
-				UI_error_message("No impassible object located at " + start_x + ", " + start_y);
-				
-				
-			}	
-			else //something is blocking the jump, no need to check the rest
-			{
-				UI_error_message("An impassible object located at " + start_x + ", " + start_y);	
-				return true;
-			}	
-			start_y += 1;
-		}
-	
-	
-	}	
-	else if (start_y > destination[Y])
-	{
-		while (start_y > destination[Y])
-		{
-			if (UI_is_not_blocked([start_x, start_y, MAX_JUMP_HEIGHT], SHAPE, FRAME_ANY))
-			{
-				UI_error_message("No impassible object located at " + start_x + ", " + start_y);
-				
-				
-			}	
-			else //something is blocking the jump, no need to check the rest
-			{
-				UI_error_message("An impassible object located at " + start_x + ", " + start_y);	
-				return true;
-			}	
-			start_y -= 1;
-		}
-	
-	
-	}		
-	return false;
+	return [0, 0];
 }
 
-
-void wand shape#(476) ()    
+var u8eCanLandAvatar(var x, var y, var z)
 {
-	var direction = getFacing(AVATAR);
-	var position = UI_get_object_position(AVATAR);
-	var destination; //get tile Avatar is going to land on:
-	var desX = position[X];
-	var desY = position[Y];
-	var desZ = position[Z];
-	if (direction == EAST)
-		desX = position[X] + 5;
-	else if (direction == WEST)
-		desX = position[X] - 5;
-	else if (direction == NORTH)
-		desY = position[Y] + 5;
-	else if (direction == SOUTH)
-		desY = position[Y];
-	else
-		UI_error_message("Something went wrong - direction not found.");
-	destination = [desX, desY, desZ];
-		
-	UI_error_message("Destination x is " + destination[X] + ", " + destination[Y] + ", " + destination[Z]);
-	UI_close_gumps();
-	
-	//determines if location can be jumped too (no obstacles higher than 2 z axis
-	var is_blocked; 
-	
-	//check the destination Z levels up to 2 to see if it is "jumpable".  Increments Z up to 2
-	while (desZ < 3)
+	/*
+	 * Use the canonical Avatar shape for collision dimensions.  The redirected
+	 * U8 avatar visuals may not carry reliable TFA collision data, while the SI
+	 * male/female Avatar shapes are both 1x1x4.
+	 */
+	const int AVATAR_COLLISION_SHAPE = SHAPE_MALE_AVATAR;
+
+	if (z == 0 && UI_is_water([x, y, z]))
+		return false;
+
+	return UI_is_not_blocked([x, y, z], AVATAR_COLLISION_SHAPE, 0);
+}
+
+var u8eFindJumpLanding(var avatar, var start_pos, var direction)
+{
+	var delta = u8eGetFacingDelta(direction);
+	var dx = delta[1];
+	var dy = delta[2];
+
+	if (dx == 0 && dy == 0)
+		return [0, start_pos, "I can't jump that way"];
+
+	var start_x = start_pos[X];
+	var start_y = start_pos[Y];
+	var start_z = UI_get_lift(avatar);
+
+	var min_z = start_z - 3;
+	if (min_z < 0)
+		min_z = 0;
+
+	var distance = 3;
+	while (distance >= 1)
 	{
-		is_blocked = isPositionBlocked(position, destination, direction);
-		if (is_blocked)
-			say("Landing position blocked at coordinates: " + destination[X] + ", " + destination[Y] + ", " + destination[Z]); 
-		desZ += 1; 
-		destination = [desX, desY, desZ];
-	
-	}
-	
-	if (!is_blocked)
-	{
-		var descend_Z = 3 - desZ;
-		script AVATAR
+		var landing_x = start_x + (dx * distance);
+		var landing_y = start_y + (dy * distance);
+		var z = start_z + 3;
+
+		while (z >= min_z)
 		{
-			actor frame bowing; 
-			actor frame standing; 
-			rise;
-			step direction;
-			rise;
-			step direction; 
-			rise;
-			step direction; 
-			
-			repeat descend_Z
-			{
-				descent;
-				step direction; 
-			};
-		
-			actor frame bowing; 
-			actor frame standing; 
-			
+			if (u8eCanLandAvatar(landing_x, landing_y, z))
+				return [1, [landing_x, landing_y, z], ""];
+
+			z -= 1;
 		}
+
+		distance -= 1;
 	}
-	else 
-		delayedBark(AVATAR, "@I can't jump there.@", 1);
+
+	return [0, start_pos, "I can't jump there"];
+}
+
+var u8eCreateJumpMarker(var landing_pos)
+{
+	const int JUMP_MARKER_SHAPE = 247;
+	const int SI_DONT_RENDER = 22;
+
+	var marker = UI_create_new_object(JUMP_MARKER_SHAPE);
+	if (!marker)
+		return false;
+
+	marker->set_item_flag(SI_DONT_RENDER);
+	marker->set_item_flag(TEMPORARY);
+	UI_update_last_created(landing_pos);
+
+	return marker;
+}
+
+void u8ePinAvatarToMarker object#() ()
+{
+	var avatar = UI_get_avatar_ref();
+	var pos = UI_get_object_position(item);
+	UI_move_object(avatar, [pos[X], pos[Y], pos[Z]], 0);
+	UI_remove_item(item);
+	UI_set_camera(avatar);
+	UI_center_view(avatar);
+}
+
+var u8eBarkJumpFailure(var reason)
+{
+	delayedBark(AVATAR, "@" + reason + ".@", 1);
+}
+
+void u8eJumpForward(var avatar)
+{
+	var direction = getFacing(avatar);
+	var start_pos = UI_get_object_position(avatar);
+	var landing = u8eFindJumpLanding(avatar, start_pos, direction);
+
+	UI_close_gumps();
+
+	if (!landing[1])
+	{
+		u8eBarkJumpFailure(landing[3]);
+		return;
+	}
+
+	var landing_pos = landing[2];
+	var marker = u8eCreateJumpMarker(landing_pos);
+	if (!marker)
+	{
+		u8eBarkJumpFailure("I can't jump there");
+		return;
+	}
+
+	script avatar
+	{
+		actor frame bowing;
+		actor frame standing;
+		rise;
+		step direction;
+		rise;
+		step direction;
+		descent;
+		step direction;
+		descent;
+		actor frame bowing;
+		actor frame standing;
+	}
+
+	script marker after 8 ticks call u8ePinAvatarToMarker;
+}
+
+void wand shape#(476) ()
+{
+	u8eJumpForward(UI_get_avatar_ref());
 }
